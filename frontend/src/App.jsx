@@ -7,15 +7,20 @@ function App() {
 
   const handleSubmit = async () => {
     try {
-      const res = await axios.post("http://localhost:5000/analyze", { idea });
+      console.log("Button clicked");
+
+      const res = await axios.post("https://kalnet-assignment.onrender.com", { idea });
+
+      console.log("Response:", res.data);
+
       setResult(res.data);
-    } catch (err) {
-      console.error(err);
+    } catch (error) {
+      console.error("Error:", error);
     }
   };
 
   return (
-    <div style={{ padding: "20px" }}>
+    <div style={{ padding: "20px", maxWidth: "600px", margin: "auto" }}>
       <h1>Explain My Plan</h1>
 
       <textarea
@@ -36,17 +41,23 @@ function App() {
 
           <h3>Steps:</h3>
           <ul>
-            {result.steps?.map((s, i) => <li key={i}>{s}</li>)}
+            {result.steps?.map((s, i) => (
+              <li key={i}>{s}</li>
+            ))}
           </ul>
 
           <h3>Missing:</h3>
           <ul>
-            {result.missing?.map((m, i) => <li key={i}>{m}</li>)}
+            {result.missing?.map((m, i) => (
+              <li key={i}>{m}</li>
+            ))}
           </ul>
 
-          <h3>Actions:</h3>
+          <h3>Action Steps:</h3>
           <ul>
-            {result.actions?.map((a, i) => <li key={i}>{a}</li>)}
+            {result.actions?.map((a, i) => (
+              <li key={i}>{a}</li>
+            ))}
           </ul>
 
           <h3>Score:</h3>
