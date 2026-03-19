@@ -9,7 +9,7 @@ function App() {
     try {
       console.log("Button clicked");
 
-      const res = await axios.post("https://kalnet-assignment.onrender.com/analyze", { idea });
+      const res = await axios.post("https://kalnet-assignment.onrender.com/analyze", { idea:input});
 
       console.log("Response:", res.data);
 
