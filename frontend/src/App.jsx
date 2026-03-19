@@ -1,16 +1,44 @@
-const handleSubmit = async () => {
-  try {
-    console.log("Button clicked");
+import { useState } from "react";
+import axios from "axios";
 
-    const res = await axios.post(
-      "https://kalnet-assignment.onrender.com/analyze",
-      { idea: idea }
-    );
+function App() {
+  const [idea, setIdea] = useState("");
+  const [result, setResult] = useState(null);
 
-    console.log("Response:", res.data);
+  const handleSubmit = async () => {
+    try {
+      const res = await axios.post(
+        "https://kalnet-assignment.onrender.com/analyze",
+        { idea: idea }
+      );
 
-    setResult(res.data);
-  } catch (error) {
-    console.error("Error:", error);
-  }
-};
+      setResult(res.data);
+
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  return (
+    <div>
+      <h1>Explain My Plan</h1>
+
+      <textarea
+        value={idea}
+        onChange={(e) => setIdea(e.target.value)}
+      />
+
+      <br />
+
+      <button onClick={handleSubmit}>Analyze</button>
+
+      {result && (
+        <div>
+          <p>{result.goal}</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default App;
