@@ -4,18 +4,26 @@ import axios from "axios";
 function App() {
   const [idea, setIdea] = useState("");
   const [result, setResult] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async () => {
     try {
       console.log("Button clicked");
 
-      const res = await axios.post("https://kalnet-assignment.onrender.com/analyze", { idea:input});
+      setLoading(true);
+
+      const res = await axios.post(
+        "https://kalnet-assignment.onrender.com/analyze",
+        { idea: idea }   // ✅ FIXED HERE
+      );
 
       console.log("Response:", res.data);
 
       setResult(res.data);
+      setLoading(false);
     } catch (error) {
       console.error("Error:", error);
+      setLoading(false);
     }
   };
 
@@ -27,6 +35,7 @@ function App() {
         rows="5"
         cols="50"
         placeholder="Enter your idea..."
+        value={idea}   // ✅ added value binding
         onChange={(e) => setIdea(e.target.value)}
       />
 
@@ -34,6 +43,10 @@ function App() {
 
       <button onClick={handleSubmit}>Analyze</button>
 
+      {/* ✅ Loading indicator */}
+      {loading && <p>Loading... please wait ⏳</p>}
+
+      {/* ✅ Result display */}
       {result && (
         <div style={{ marginTop: "20px" }}>
           <h3>Goal:</h3>
