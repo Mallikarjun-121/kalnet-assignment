@@ -1,44 +1,30 @@
-import { useState } from "react";
-import axios from "axios";
+{result && (
+  <div style={{ marginTop: "20px" }}>
+    <h3>Goal:</h3>
+    <p>{result.goal}</p>
 
-function App() {
-  const [idea, setIdea] = useState("");
-  const [result, setResult] = useState(null);
+    <h3>Steps:</h3>
+    <ul>
+      {result.steps?.map((s, i) => (
+        <li key={i}>{s}</li>
+      ))}
+    </ul>
 
-  const handleSubmit = async () => {
-    try {
-      const res = await axios.post(
-        "https://kalnet-assignment.onrender.com/analyze",
-        { idea: idea }
-      );
+    <h3>Missing:</h3>
+    <ul>
+      {result.missing?.map((m, i) => (
+        <li key={i}>{m}</li>
+      ))}
+    </ul>
 
-      setResult(res.data);
+    <h3>Actions:</h3>
+    <ul>
+      {result.actions?.map((a, i) => (
+        <li key={i}>{a}</li>
+      ))}
+    </ul>
 
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  return (
-    <div>
-      <h1>Explain My Plan</h1>
-
-      <textarea
-        value={idea}
-        onChange={(e) => setIdea(e.target.value)}
-      />
-
-      <br />
-
-      <button onClick={handleSubmit}>Analyze</button>
-
-      {result && (
-        <div>
-          <p>{result.goal}</p>
-        </div>
-      )}
-    </div>
-  );
-}
-
-export default App;
+    <h3>Score:</h3>
+    <p>{result.score}</p>
+  </div>
+)}
