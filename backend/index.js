@@ -1,65 +1,62 @@
 const express = require("express");
 const cors = require("cors");
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
-app.post("/analyze", (req, res) => {
-  const idea = req.body.idea.toLowerCase();
+// 🔥 Add your Gemini API Key here
+const genAI = new GoogleGenerativeAI("AIzaSyBq6g2J3HtqXJsg92doFOZMQaLpL0T0B3M");
 
-  console.log("User idea:", idea);
+app.post("/analyze", async (req, res) => {
+  try {
+    const idea = req.body.idea;
 
-  let goal = "";
-  let steps = [];
-  let missing = [];
-  let actions = [];
-  let score = 50;
+    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
-  if (idea.includes("weight") || idea.includes("fit")) {
-    goal = "Lose weight and improve fitness";
-    steps = [
-      "Do daily exercise",
-      "Follow healthy diet",
-      "Track progress"
-    ];
-    missing = [
-      "No timeline defined",
-      "No workout plan"
-    ];
-    actions = [
-      "Start 30 min workout daily",
-      "Follow calorie deficit diet"
-    ];
-    score = 75;
-  } 
-  else if (idea.includes("business")) {
-    goal = "Start a business";
-    steps = [
-      "Identify idea",
-      "Research market",
-      "Plan budget"
-    ];
-    missing = [
-      "No target audience",
-      "No timeline"
-    ];
-    actions = [
-      "Create business plan",
-      "Start small"
-    ];
-    score = 70;
-  } 
-  else {
-    goal = "General goal";
-    steps = ["Define steps"];
-    missing = ["More details needed"];
-    actions = ["Plan properly"];
-    score = 50;
+    const prompt = `
+Convert this idea into structured JSON.
+
+Return ONLY JSON in this format:
+{
+  "goal": "",
+  "steps": [],
+  "missing": [],
+  "actions": [],
+  "score": number
+}
+
+Idea: ${idea}
+`;
+
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    let text = response.text();
+
+    // Clean response
+    text = text.replace(/```json|```/g, "").trim();
+
+    let parsed;
+    try {
+      parsed = JSON.parse(text);
+    } catch {
+      parsed = {
+        goal: "Could not parse AI response",
+        steps: [],
+        missing: [],
+        actions: [],
+        score: 50
+      };
+    }
+
+    res.json(parsed);
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "AI processing failed" });
   }
-
-  res.json({ goal, steps, missing, actions, score });
 });
 
 app.listen(5000, () => {
