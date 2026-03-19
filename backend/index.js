@@ -1,76 +1,58 @@
 const express = require("express");
 const cors = require("cors");
-const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 const app = express();
 
-// ✅ Middleware
 app.use(cors());
 app.use(express.json());
 
-// ✅ Add your Gemini API key here
-const genAI = new GoogleGenerativeAI("AIzaSyBq6g2J3HtqXJsg92doFOZMQaLpL0T0B3M");
-
-// ✅ Test route (optional but useful)
+// ✅ TEST ROUTE
 app.get("/", (req, res) => {
-  res.send("Backend is running 🚀");
+  res.send("Backend running ✅");
 });
 
-// ✅ Main API
+// ✅ MAIN API (SAFE VERSION)
 app.post("/analyze", async (req, res) => {
   try {
     const idea = req.body.idea;
-    console.log("Idea received:", idea);
+    console.log("Idea:", idea);
 
-    const model = genAI.getGenerativeModel({
-      model: "gemini-1.5-flash"
-    });
+    // 🔥 TEMP LOGIC (NO AI → NO ERROR)
+    let goal = "General Goal";
+    let steps = ["Plan properly"];
+    let missing = ["More details needed"];
+    let actions = ["Take first step"];
+    let score = 50;
 
-    const prompt = `
-Convert this idea into structured JSON.
-
-Return ONLY JSON:
-{
-  "goal": "",
-  "steps": [],
-  "missing": [],
-  "actions": [],
-  "score": number
-}
-
-Idea: ${idea}
-`;
-
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    let text = response.text();
-
-    let parsed;
-
-    try {
-      text = text.replace(/```json|```/g, "").trim();
-      parsed = JSON.parse(text);
-    } catch (e) {
-      console.log("AI raw response:", text);
-
-      parsed = {
-        goal: "AI parsing failed",
-        steps: ["Try again"],
-        missing: [],
-        actions: [],
-        score: 50
-      };
+    if (idea.toLowerCase().includes("fit")) {
+      goal = "Improve fitness";
+      steps = ["Exercise daily", "Eat healthy"];
+      actions = ["Start gym", "Track calories"];
+      score = 80;
+    } 
+    else if (idea.toLowerCase().includes("business")) {
+      goal = "Start a business";
+      steps = ["Research market", "Create plan"];
+      actions = ["Validate idea", "Start small"];
+      score = 75;
     }
 
-    res.json(parsed);
+    res.json({ goal, steps, missing, actions, score });
 
   } catch (error) {
     console.error("ERROR:", error);
-    res.status(500).json({ error: "Server error" });
+
+    res.json({
+      goal: "Server error",
+      steps: ["Try again"],
+      missing: [],
+      actions: [],
+      score: 40
+    });
   }
 });
 
-// ✅ IMPORTANT for Render deployment
+// ✅ IMPORTANT FOR RENDER
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
